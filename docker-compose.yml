@@ -1,0 +1,40 @@
+services:
+
+  postgresql:
+    image: postgres:16
+    container_name: postgresql_apiusuarios
+    restart: always
+    environment:
+      POSTGRES_USER: apiusuarios
+      POSTGRES_PASSWORD: coti2026
+      POSTGRES_DB: bdapiusuarios
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - apiusuarios-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_apiusuarios
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgresql
+    networks:
+      - apiusuarios-network
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  apiusuarios-network:
+    driver: bridge
