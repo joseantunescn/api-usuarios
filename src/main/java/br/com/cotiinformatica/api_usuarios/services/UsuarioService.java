@@ -1,6 +1,7 @@
 package br.com.cotiinformatica.api_usuarios.services;
 
 import br.com.cotiinformatica.api_usuarios.components.CryptoComponent;
+import br.com.cotiinformatica.api_usuarios.components.JwtTokenComponent;
 import br.com.cotiinformatica.api_usuarios.dtos.AutenticarRequestDTO;
 import br.com.cotiinformatica.api_usuarios.dtos.AutenticarResponseDTO;
 import br.com.cotiinformatica.api_usuarios.dtos.UsuarioRequestDto;
@@ -23,6 +24,9 @@ public class UsuarioService {
 
     @Autowired
     private CryptoComponent cryptoComponent;
+
+    @Autowired
+    private JwtTokenComponent jwtTokenComponent;
 
     public UsuarioResponseDto criarUsuario(UsuarioRequestDto request) {
 
@@ -63,14 +67,18 @@ public class UsuarioService {
             throw new AcessoNegadoException();
 
         }
+
+        // generate the jwt token for the authenticated user
+        var token = jwtTokenComponent.getToken(usuario.getId(), usuario.getEmail(), usuario.getPerfil().toString());
+
+
         return new AutenticarResponseDTO(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
                 LocalDateTime.now(),
                 usuario.getPerfil().toString(),
-                "<<TOKEN_AQUI>>"
-
+                token
         );
     }
 }
