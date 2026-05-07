@@ -1,5 +1,24 @@
 services:
 
+  # Serviço da API Spring Boot
+  api-usuarios:
+    build:
+      context: .                # Diretório onde está o Dockerfile
+      dockerfile: Dockerfile   # Nome do seu Dockerfile
+    container_name: apiusuarios_app
+    restart: always
+    ports:
+      - "8082:8082"            # Porta externa 8081 → interna 8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/bdapiusuarios
+      SPRING_DATASOURCE_USERNAME: apiusuarios
+      SPRING_DATASOURCE_PASSWORD: coti2026
+    depends_on:
+      - postgresql
+    networks:
+      - apiusuarios-network
+
+  # Banco de dados PostgreSQL
   postgresql:
     image: postgres:16
     container_name: postgresql_apiusuarios
@@ -15,6 +34,7 @@ services:
     networks:
       - apiusuarios-network
 
+  # Interface web do PostgreSQL (pgAdmin)
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin_apiusuarios
