@@ -1,15 +1,14 @@
 package br.com.cotiinformatica.api_usuarios.controllers;
 
+import br.com.cotiinformatica.api_usuarios.components.JwtTokenComponent;
 import br.com.cotiinformatica.api_usuarios.dtos.AutenticarRequestDTO;
 import br.com.cotiinformatica.api_usuarios.dtos.UsuarioRequestDto;
 import br.com.cotiinformatica.api_usuarios.exceptions.EmailJaCadastradoException;
 import br.com.cotiinformatica.api_usuarios.services.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import br.com.cotiinformatica.api_usuarios.exceptions.AcessoNegadoException;
 
 @RestController
@@ -18,6 +17,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private JwtTokenComponent jwtTokenComponent;
 
     @PostMapping("criar")
     public ResponseEntity<?> postCriarUsuario(@RequestBody UsuarioRequestDto request) {
@@ -48,5 +50,16 @@ public class UsuarioController {
         catch (Exception e) {
             return ResponseEntity.status(500).body("Erro interno no servidor. Tente novamente mais tarde.");
         }
+    }
+
+    @GetMapping("obter-dados")
+    public ResponseEntity<?> getObterDadosUsuario(HttpServletRequest http) {
+
+        // Obter o ID do usuário a partir do token JWT
+        var id = jwtTokenComponent.getUserId(http);
+
+        var response = usuarioService.ObterDadosDoUsuario(id);
+
+        return ResponseEntity.status(200).body(response);
     }
 }

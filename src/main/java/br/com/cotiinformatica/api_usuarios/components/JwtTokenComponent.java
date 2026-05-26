@@ -1,7 +1,9 @@
 package br.com.cotiinformatica.api_usuarios.components;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -40,4 +42,33 @@ public class JwtTokenComponent {
                 .signWith(SignatureAlgorithm.HS256, secret) // chave de assinatura
                 .compact(); // finaliza e retorna o token gerado
     }
+
+    // method to extract the user id from the token
+    public UUID getUserId(HttpServletRequest http) {
+
+        try {
+            // Obter o cabeçalho Authorization
+            String authorization = http.getHeader("Authorization");
+            if (authorization == null|| !authorization.startsWith("Bearer ")) {
+                return null;
+            }
+
+            // Extrair o token (remove o "Bearer ")
+            String token = authorization.replace("Bearer ", "");
+
+            // Parse do token
+            Claims claims = Jwts.parser().setSigningKey(secret.getBytes())
+                    .parseClaimsJws(token).getBody();
+
+            // Retornar a claim "name"
+            var user = claims.get("name", String.class);
+
+            return UUID.fromString(user);
+        } catch (Exception e) {
+            // Token inválido ou ausente
+            return null;
+        }
+    }
 }
+
+

@@ -2,10 +2,7 @@ package br.com.cotiinformatica.api_usuarios.services;
 
 import br.com.cotiinformatica.api_usuarios.components.CryptoComponent;
 import br.com.cotiinformatica.api_usuarios.components.JwtTokenComponent;
-import br.com.cotiinformatica.api_usuarios.dtos.AutenticarRequestDTO;
-import br.com.cotiinformatica.api_usuarios.dtos.AutenticarResponseDTO;
-import br.com.cotiinformatica.api_usuarios.dtos.UsuarioRequestDto;
-import br.com.cotiinformatica.api_usuarios.dtos.UsuarioResponseDto;
+import br.com.cotiinformatica.api_usuarios.dtos.*;
 import br.com.cotiinformatica.api_usuarios.entities.Usuario;
 import br.com.cotiinformatica.api_usuarios.enums.Perfil;
 import br.com.cotiinformatica.api_usuarios.exceptions.AcessoNegadoException;
@@ -15,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -79,6 +77,20 @@ public class UsuarioService {
                 LocalDateTime.now(),
                 usuario.getPerfil().toString(),
                 token
+        );
+    }
+
+    public DadosUsuarioResponseDto ObterDadosDoUsuario(UUID id) {
+
+        //Consultar o usuário no banco de dados através do id
+        var usuario = usuarioRepository.findById(id).get();
+
+        //Retornar os dados do usuário
+        return new DadosUsuarioResponseDto(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getPerfil().toString()
         );
     }
 }
