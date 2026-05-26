@@ -43,32 +43,32 @@ public class JwtTokenComponent {
                 .compact(); // finaliza e retorna o token gerado
     }
 
-    // method to extract the user id from the token
+    /*
+        Método para extrair o ID do usuário contido no TOKEN
+     */
     public UUID getUserId(HttpServletRequest http) {
 
         try {
-            // Obter o cabeçalho Authorization
             String authorization = http.getHeader("Authorization");
-            if (authorization == null|| !authorization.startsWith("Bearer ")) {
+
+            if (authorization == null || !authorization.startsWith("Bearer ")) {
                 return null;
             }
 
-            // Extrair o token (remove o "Bearer ")
-            String token = authorization.replace("Bearer ", "");
+            String token = authorization.substring(7);
 
-            // Parse do token
-            Claims claims = Jwts.parser().setSigningKey(secret.getBytes())
-                    .parseClaimsJws(token).getBody();
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token)
+                    .getBody();
 
-            // Retornar a claim "name"
-            var user = claims.get("name", String.class);
+            String user = claims.getSubject();
 
             return UUID.fromString(user);
+
         } catch (Exception e) {
-            // Token inválido ou ausente
+            e.printStackTrace();
             return null;
         }
     }
 }
-
-
